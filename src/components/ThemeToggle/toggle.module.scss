@@ -1,0 +1,61 @@
+.btnToggle {
+  --toggle-width: 60px;
+  --toggle-height: 24px;
+  --toggle-padding: 2px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  line-height: 1rem;
+  width: calc(var(--toggle-width) - 14px);
+  height: var(--toggle-height);
+  padding: var(--toggle-padding);
+  border: 0;
+  border-radius: calc(var(--toggle-width) / 2);
+  cursor: pointer;
+  background: var(--color-bg-toggle);
+  transition: background 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+  transform: translateX(30px);
+
+  &:focus {
+    outline-offset: 5px;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:hover {
+    box-shadow: 0 0 5px 2px var(--color-bg-toggle);
+  }
+
+  & .toggleThumbLight {
+    z-index: 999;
+    position: absolute;
+    top: var(--toggle-padding);
+    left: calc(var(--toggle-padding));
+    width: calc(var(--toggle-height) - (var(--toggle-padding) * 2));
+    height: calc(var(--toggle-height) - (var(--toggle-padding) * 2));
+    border-radius: 50%;
+    background: var(--color-bt-toggle);
+    transition: transform 0.25s ease-in-out;
+    transform: translate3d(
+      calc(var(--toggle-width) - var(--toggle-height) - 14px),
+      0,
+      0
+    );
+  }
+
+  & .toggleThumbDark {
+    z-index: 999;
+    position: absolute;
+    top: var(--toggle-padding);
+    left: calc(var(--toggle-padding));
+    width: calc(var(--toggle-height) - (var(--toggle-padding) * 2));
+    height: calc(var(--toggle-height) - (var(--toggle-padding) * 2));
+    border-radius: 50%;
+    background: var(--color-bt-toggle);
+    transition: transform 0.25s ease-in-out;
+  }
+}
