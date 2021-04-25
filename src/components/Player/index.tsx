@@ -31,6 +31,18 @@ export function Player() {
   } = usePlayer();
 
   useEffect(() => {
+
+    async function teste() {
+      const data = await getAudioOutputs();
+
+      const teste2 = await getConnectedDevices('audiooutput');
+
+      console.log('Dispositivos::>', data);
+      console.log('Dispositivos:::last:::>', teste2);
+    }
+
+    teste();
+
     if (!audioRef.current) {
       return;
     }
@@ -64,6 +76,53 @@ export function Player() {
   }
 
   const episode = episodeList[currentEpisodeIndex];
+
+  async function listDevices() : Promise<MediaDeviceInfo[]>
+  {
+      return await navigator.mediaDevices.enumerateDevices();
+  };
+
+  async function getConnectedDevices(type: string) {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.filter(device => device.kind === type)
+  }
+
+  async function getAudioOutputs ()
+  {
+    // return promise of devices audio output list
+    return await listDevices().then((devices) => {
+        console.log(':::devices:::1:::', devices);
+
+        // get audio output devices
+        const audioDevices = devices.filter((device) => {
+            console.log(':::device:::2:::', device);
+
+            return device.kind === 'audiooutput'
+        });
+
+        // // initialize result as empty array
+        // var result = [];
+
+        console.log(':::audioDevices:::3:::', audioDevices);
+
+        // iterate over each device
+        const result = audioDevices.map((device) => {
+
+            console.log(':::device:::4:::', device);
+            // add current device to final result
+            return {
+                id: device.deviceId,
+                label: device.label
+            };
+        });
+
+        console.log(':::result:::5:::', result);
+
+        // return result
+        return result;
+    });
+  };
+
 
   return (
     <div className={styles.playerContainer}>
