@@ -2,10 +2,10 @@ import { format } from 'date-fns';
 import { parseISO } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { GetStaticProps } from 'next';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useContext } from 'react';
-import { PlayerContext } from '../contexts/PlayerContext';
+import { usePlayer } from '../contexts/PlayerContext';
 
 import { api } from '../services/api';
 import { convertDurationToTimeString } from '../utils/convertDurationToTimeString';
@@ -13,14 +13,14 @@ import { convertDurationToTimeString } from '../utils/convertDurationToTimeStrin
 import styles from './home.module.scss';
 
 type Episode = {
-  id: string,
-  title: string,
-  duration: Number,
-  durationAsString: string,
-  members: string,
-  publishedAt: string,
-  thumbnail: string,
-  url: string,
+  id: string;
+  title: string;
+  duration: number;
+  durationAsString: string;
+  members: string;
+  publishedAt: string;
+  thumbnail: string;
+  url: string;
 };
 
 type HomeProps = {
@@ -28,21 +28,26 @@ type HomeProps = {
   allEpisodes: Episode[];
 };
 
-
 export default function Home({ latestEpisodes, allEpisodes }: HomeProps) {
-  const { play } = useContext(PlayerContext);
+  const { playList } = usePlayer();
+
+  const episodeList = [...latestEpisodes, ...allEpisodes];
 
   return (
     <div className={styles.homepage}>
+      <Head>
+        <title>Home | Podcastr</title>
+      </Head>
+
       <section className={styles.latestEpisodes}>
         <h2>Últimos lançamentos</h2>
 
         <ul>
-          {latestEpisodes.map(episode => {
+          {latestEpisodes.map((episode, index) => {
             return (
               <li key={episode.id}>
                 <div>
-                  <Image 
+                  <Image
                     width={192}
                     height={192}
                     src={episode.thumbnail}
@@ -60,11 +65,14 @@ export default function Home({ latestEpisodes, allEpisodes }: HomeProps) {
                   <span>{episode.durationAsString}</span>
                 </div>
 
-                <button type="button" onClick={() => play(episode)}>
-                  <img src="/play-green.svg" alt="tocar episódio"/>
+                <button
+                  type="button"
+                  onClick={() => playList(episodeList, index)}
+                >
+                  <img src="/play-green.svg" alt="tocar episódio" />
                 </button>
               </li>
-            )
+            );
           })}
         </ul>
       </section>
@@ -84,11 +92,11 @@ export default function Home({ latestEpisodes, allEpisodes }: HomeProps) {
             </tr>
           </thead>
           <tbody>
-            {allEpisodes.map(episode => {
+            {allEpisodes.map((episode, index) => {
               return (
                 <tr key={episode.id}>
-                  <td  style={{ minWidth: 72 }}>
-                    <Image 
+                  <td style={{ minWidth: 72 }}>
+                    <Image
                       width={120}
                       height={120}
                       src={episode.thumbnail}
@@ -105,20 +113,24 @@ export default function Home({ latestEpisodes, allEpisodes }: HomeProps) {
                   <td style={{ width: 100 }}>{episode.publishedAt}</td>
                   <td>{episode.durationAsString}</td>
                   <td>
-                    <button type="button">
-                      <img src="/play-green.svg" alt="tocar episódio"/>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        playList(episodeList, index + latestEpisodes.length)
+                      }
+                    >
+                      <img src="/play-green.svg" alt="tocar episódio" />
                     </button>
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
       </section>
     </div>
-  )
-};
-
+  );
+}
 
 /**
  * concept SSG - server side generation
@@ -139,11 +151,15 @@ export const getStaticProps: GetStaticProps = async () => {
       title: episode.title,
       thumbnail: episode.thumbnail,
       members: episode.members,
-      publishedAt: format(parseISO(episode.published_at), 'd MMM yy', { locale: ptBR }),
+      publishedAt: format(parseISO(episode.published_at), 'd MMM yy', {
+        locale: ptBR
+      }),
       duration: Number(episode.file.duration),
-      durationAsString: convertDurationToTimeString(Number(episode.file.duration)),
-      url: episode.file.url,
-    }
+      durationAsString: convertDurationToTimeString(
+        Number(episode.file.duration)
+      ),
+      url: episode.file.url
+    };
   });
 
   const latestEpisodes = episodes.slice(0, 2);
@@ -155,5 +171,5 @@ export const getStaticProps: GetStaticProps = async () => {
       allEpisodes
     },
     revalidate: 60 * 60 * 8 // valida a cada 8hs
-  }
-}
+  };
+};

@@ -17,7 +17,7 @@
     @media (min-width: 1366px) {
       grid-template-columns: repeat(2, 1fr);
     }
-    
+
     gap: 1.5rem;
 
     li {
@@ -73,11 +73,11 @@
             position: relative;
 
             &::before {
-              content: "";
+              content: '';
               width: 4px;
               height: 4px;
               border-radius: 2px;
-              background: #DDD;
+              background: #ddd;
               position: absolute;
               left: 0;
               top: 50%;
